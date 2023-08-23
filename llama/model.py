@@ -15,6 +15,9 @@ from fairscale.nn.model_parallel.layers import (
 )
 from torch import nn
 
+from llama.utils import get_local_device
+
+LOCAL_DEVICE = get_local_device()
 
 @dataclass
 class ModelArgs:
@@ -132,7 +135,7 @@ class Attention(nn.Module):
                 self.n_local_kv_heads,
                 self.head_dim,
             )
-        ).cuda()
+        ).to(LOCAL_DEVICE)
         self.cache_v = torch.zeros(
             (
                 args.max_batch_size,
@@ -140,7 +143,7 @@ class Attention(nn.Module):
                 self.n_local_kv_heads,
                 self.head_dim,
             )
-        ).cuda()
+        ).to(LOCAL_DEVICE)
 
     def forward(
         self,
