@@ -50,6 +50,8 @@ UNSAFE_ERROR = "Error: special tags are not allowed as part of the prompt."
 
 LOCAL_DEVICE = get_local_device()
 
+SECONDS_TO_NANO_SECONDS = 1e9
+
 class Llama:
     @staticmethod
     def build(
@@ -197,6 +199,9 @@ class Llama:
         if max_gen_len is None:
             max_gen_len = self.model.params.max_seq_len - 1
         prompt_tokens = [self.tokenizer.encode(x, bos=True, eos=False) for x in prompts]
+
+        inference_start_time_ns = time.time_ns()
+
         generation_tokens, generation_logprobs = self.generate(
             prompt_tokens=prompt_tokens,
             max_gen_len=max_gen_len,
@@ -205,6 +210,14 @@ class Llama:
             logprobs=logprobs,
             echo=echo,
         )
+
+        inference_end_time_ns = time.time_ns()
+        inference_duration_ns = inference_end_time_ns - inference_start_time_ns
+        num_tokens =  sum([len(t) for t in generation_tokens])
+        print(f"inference time: ", inference_duration_ns, " nanoseconds")
+        print(f"num_tokens: ", num_tokens)
+        print(f"tokens / sec: {num_tokens * SECONDS_TO_NANO_SECONDS / inference_duration_ns:.2f}")
+
         if logprobs:
             return [
                 {
