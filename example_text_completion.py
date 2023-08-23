@@ -22,33 +22,22 @@ def main(
         max_batch_size=max_batch_size,
     )
 
-    prompts = [
-        # For these prompts, the expected answer is the natural continuation of the prompt
-        "I believe the meaning of life is",
-        "Simply put, the theory of relativity states that ",
-        """A brief message congratulating the team on the launch:
-
-        Hi everyone,
-        
-        I just """,
-        # Few shot prompt (providing a few examples before asking model to complete more);
-        """Translate English to French:
-        
-        sea otter => loutre de mer
-        peppermint => menthe poivrée
-        plush girafe => girafe peluche
-        cheese =>""",
-    ]
-    results = generator.text_completion(
-        prompts,
-        max_gen_len=max_gen_len,
-        temperature=temperature,
-        top_p=top_p,
-    )
-    for prompt, result in zip(prompts, results):
-        print(prompt)
-        print(f"> {result['generation']}")
-        print("\n==================================\n")
+    while True:
+      input_text = input('Please type a prompt, or enter "exit": ')
+      if input_text == 'exit':
+        break
+      print(f"Running inference for the prompt: {input_text}")
+      prompts = [input_text]
+      results = generator.text_completion(
+          prompts,
+          max_gen_len=max_gen_len,
+          temperature=temperature,
+          top_p=top_p,
+      )
+      for prompt, result in zip(prompts, results):
+          print(prompt)
+          print(f"> {result['generation']}")
+          print("\n==================================\n")
 
 
 if __name__ == "__main__":
